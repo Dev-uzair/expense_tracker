@@ -59,7 +59,7 @@ void main() {
     final tTransaction = Transaction(
       id: '1',
       amount: 100.0,
-      category: 'Food',
+      categoryId: '2',
       type: 'expense',
       date: DateTime.now(),
     );

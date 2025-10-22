@@ -14,21 +14,27 @@ class Category extends HiveObject with EquatableMixin {
   @HiveField(2)
   final String type; // 'expense' or 'income'
 
+  @HiveField(3)
+  final String? categoryIcon;
+
   Category({
     required this.id,
     required this.name,
     required this.type,
+    this.categoryIcon,
   });
 
   Category copyWith({
     String? id,
     String? name,
     String? type,
+    String? categoryIcon,
   }) {
     return Category(
       id: id ?? this.id,
       name: name ?? this.name,
       type: type ?? this.type,
+      categoryIcon: categoryIcon ?? this.categoryIcon,
     );
   }
 
@@ -37,6 +43,7 @@ class Category extends HiveObject with EquatableMixin {
       'id': id,
       'name': name,
       'type': type,
+      'categoryIcon': categoryIcon,
     };
   }
 
@@ -45,9 +52,10 @@ class Category extends HiveObject with EquatableMixin {
       id: json['id'],
       name: json['name'],
       type: json['type'],
+      categoryIcon: json['categoryIcon'],
     );
   }
 
   @override
-  List<Object?> get props => [id, name, type];
+  List<Object?> get props => [id, name, type, categoryIcon];
 }

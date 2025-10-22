@@ -59,7 +59,8 @@ void main() {
     final tCategory = Category(
       id: '1',
       name: 'Food',
-      type: ''
+      type: '',
+        categoryIcon: ''
     );
 
     test('initial state is loading and then data', () async {

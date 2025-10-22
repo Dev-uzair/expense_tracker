@@ -17,7 +17,9 @@ void main() {
     final tCategory = Category(
       id: '1',
       name: 'Food',
-      type: ''
+      type: '',
+      categoryIcon: ''
+
     );
 
     test('should call addCategory on the database', () async {

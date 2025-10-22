@@ -12,7 +12,7 @@ class Transaction extends HiveObject with EquatableMixin {
   final double amount;
 
   @HiveField(2)
-  final String category;
+  final String categoryId;
 
   @HiveField(3)
   final String type;
@@ -20,27 +20,39 @@ class Transaction extends HiveObject with EquatableMixin {
   @HiveField(4)
   final DateTime date;
 
+  @HiveField(5)
+  final String? description; // New field
+
+  @HiveField(6)
+  final String? paymentMethod; // New field
+
   Transaction({
     required this.id,
     required this.amount,
-    required this.category,
+    required this.categoryId,
     required this.type,
     required this.date,
+    this.description, // Made optional
+    this.paymentMethod, // Made optional
   });
 
   Transaction copyWith({
     String? id,
     double? amount,
-    String? category,
+    String? categoryId,
     String? type,
     DateTime? date,
+    String? description,
+    String? paymentMethod,
   }) {
     return Transaction(
       id: id ?? this.id,
       amount: amount ?? this.amount,
-      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
       type: type ?? this.type,
       date: date ?? this.date,
+      description: description ?? this.description,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
     );
   }
 
@@ -48,9 +60,11 @@ class Transaction extends HiveObject with EquatableMixin {
     return {
       'id': id,
       'amount': amount,
-      'category': category,
+      'categoryId': categoryId,
       'type': type,
       'date': date.toIso8601String(),
+      'description': description,
+      'paymentMethod': paymentMethod,
     };
   }
 
@@ -58,12 +72,14 @@ class Transaction extends HiveObject with EquatableMixin {
     return Transaction(
       id: json['id'],
       amount: json['amount'],
-      category: json['category'],
+      categoryId: json['categoryId'],
       type: json['type'],
       date: DateTime.parse(json['date']),
+      description: json['description'],
+      paymentMethod: json['paymentMethod'],
     );
   }
 
   @override
-  List<Object?> get props => [id, amount, category, type, date];
+  List<Object?> get props => [id, amount, categoryId, type, date, description, paymentMethod];
 }

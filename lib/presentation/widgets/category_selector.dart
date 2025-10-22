@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/domain/category.dart';
@@ -32,41 +33,45 @@ class CategorySelector extends ConsumerWidget {
           );
         }
 
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, // 3 categories per row
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1.0, // Make items square
-          ),
-          itemCount: filteredCategories.length,
-          itemBuilder: (context, index) {
-            final category = filteredCategories[index];
-            final isSelected = selectedCategory?.id == category.id;
-            return GestureDetector(
-              onTap: () => onCategorySelected(category),
-              child: Card(
-                color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
-                elevation: isSelected ? 4 : 1,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Placeholder for icon
-                    Icon(
-                      Icons.category, // Replace with actual category icon later
-                      color: isSelected ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onSurface,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      category.name,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
+        return SizedBox(
+          height: 300, // Constrain the height of the GridView
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, // 3 categories per row
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: filteredCategories.length,
+            itemBuilder: (context, index) {
+              final category = filteredCategories[index];
+              final isSelected = selectedCategory?.id == category.id;
+              return GestureDetector(
+                onTap: () => onCategorySelected(category),
+                child: Card(
+                  color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+                  elevation: isSelected ? 4 : 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        category.categoryIcon != null
+                            ? IconData(int.parse(category.categoryIcon!),
+                                fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons')
+                            : CupertinoIcons.question_circle,
+                        color: isSelected ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onSurface,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        category.name,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),

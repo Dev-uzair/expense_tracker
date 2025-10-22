@@ -8,7 +8,7 @@ void main() {
       final transaction = Transaction(
         id: '1',
         amount: 100.0,
-        category: 'Food',
+        categoryId: '0',
         type: 'expense',
         date: date,
       );
@@ -18,7 +18,7 @@ void main() {
 
       expect(fromJson.id, transaction.id);
       expect(fromJson.amount, transaction.amount);
-      expect(fromJson.category, transaction.category);
+      expect(fromJson.categoryId, transaction.categoryId);
       expect(fromJson.type, transaction.type);
       expect(fromJson.date, transaction.date);
     });

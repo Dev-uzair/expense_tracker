@@ -16,7 +16,7 @@ class HiveInitializer {
     Hive.registerAdapter(BudgetAdapter());
 
     // Open your boxes here with specific types
-    await Hive.openBox<Transaction>(HiveDatabase.transactionBoxName);
+    final transactionBox = await Hive.openBox<Transaction>(HiveDatabase.transactionBoxName);
     final categoryBox = await Hive.openBox<Category>(HiveDatabase.categoryBoxName); // Open with type and assign
     await Hive.openBox<Budget>(HiveDatabase.budgetBoxName);
 

@@ -1,3 +1,4 @@
+import 'package:expense_tracker/presentation/pages/transaction_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/presentation/pages/category_list_page.dart';
@@ -18,6 +19,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardPage(), // Changed to DashboardPage
+    TransactionListScreen(),
     CategoryListPage(),
   ];
 
@@ -37,7 +39,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      floatingActionButton: _selectedIndex == 0 // Only show FAB on Dashboard
+      floatingActionButton: _selectedIndex == 0 || _selectedIndex == 1 // Only show FAB on Dashboard and Transactions
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.of(context).push(
@@ -54,6 +56,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
             label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Transactions',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.category),

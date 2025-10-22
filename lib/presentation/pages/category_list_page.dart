@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/presentation/providers/providers.dart';
@@ -25,6 +26,10 @@ class CategoryListPage extends ConsumerWidget {
             itemBuilder: (context, index) {
               final category = categories[index];
               return ListTile(
+                leading: Icon(category.categoryIcon != null
+                    ? IconData(int.parse(category.categoryIcon!),
+                        fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons')
+                    : CupertinoIcons.question_circle),
                 title: Text(category.name),
                 subtitle: Text(category.type),
                 // Add more details or actions here

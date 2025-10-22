@@ -1,3 +1,4 @@
+import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/presentation/providers/providers.dart';
@@ -18,6 +19,7 @@ class TransactionNotifier extends AsyncNotifier<List<Transaction>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await transactionRepository.addTransaction(transaction);
+      ref.invalidate(transactionWithCategoryProvider);
       return _getTransactions();
     });
   }
@@ -27,6 +29,7 @@ class TransactionNotifier extends AsyncNotifier<List<Transaction>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await transactionRepository.updateTransaction(transaction);
+      ref.invalidate(transactionWithCategoryProvider);
       return _getTransactions();
     });
   }
@@ -36,6 +39,7 @@ class TransactionNotifier extends AsyncNotifier<List<Transaction>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await transactionRepository.deleteTransaction(id);
+      ref.invalidate(transactionWithCategoryProvider);
       return _getTransactions();
     });
   }

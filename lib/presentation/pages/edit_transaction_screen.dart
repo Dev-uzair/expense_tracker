@@ -1,33 +1,57 @@
+import 'package:expense_tracker/domain/category.dart';
+import 'package:expense_tracker/domain/transaction.dart';
+import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart';
+import 'package:expense_tracker/presentation/widgets/category_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:expense_tracker/presentation/widgets/category_selector.dart';
-import 'package:expense_tracker/domain/category.dart';
-import 'package:expense_tracker/domain/transaction.dart'; // Import Transaction model
+import 'package:intl/intl.dart';
 
-import 'package:intl/intl.dart'; // For date formatting
-import 'package:uuid/uuid.dart';
+class EditTransactionScreen extends ConsumerStatefulWidget {
+  final Transaction transaction;
+  final Category? category;
 
-import '../notifiers/transaction_notifier.dart'; // For generating unique IDs
-
-class AddTransactionScreen extends ConsumerStatefulWidget {
-  const AddTransactionScreen({super.key});
+  const EditTransactionScreen({
+    super.key,
+    required this.transaction,
+    this.category,
+  });
 
   @override
-  ConsumerState<AddTransactionScreen> createState() => _AddTransactionScreenState();
+  ConsumerState<EditTransactionScreen> createState() =>
+      _EditTransactionScreenState();
 }
 
-class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
+class _EditTransactionScreenState extends ConsumerState<EditTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  String _transactionType = 'expense'; // 'expense' or 'income'
+  late TextEditingController _amountController;
+  late TextEditingController _descriptionController;
+  late String _transactionType;
   Category? _selectedCategory;
-  DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay.now();
+  late DateTime _selectedDate;
+  late TimeOfDay _selectedTime;
   String? _selectedPaymentMethod;
 
-  final List<String> _paymentMethods = ['Cash', 'Credit Card', 'Debit Card', 'Bank Transfer', 'Other'];
-  final Uuid _uuid = const Uuid(); // Initialize Uuid
+  final List<String> _paymentMethods = [
+    'Cash',
+    'Credit Card',
+    'Debit Card',
+    'Bank Transfer',
+    'Other'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController =
+        TextEditingController(text: widget.transaction.amount.toString());
+    _descriptionController =
+        TextEditingController(text: widget.transaction.description);
+    _transactionType = widget.transaction.type;
+    _selectedCategory = widget.category;
+    _selectedDate = widget.transaction.date;
+    _selectedTime = TimeOfDay.fromDateTime(widget.transaction.date);
+    _selectedPaymentMethod = widget.transaction.paymentMethod;
+  }
 
   @override
   void dispose() {
@@ -91,28 +115,66 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         _selectedTime.minute,
       );
 
-      final newTransaction = Transaction(
-        id: _uuid.v4(),
+      final updatedTransaction = widget.transaction.copyWith(
         amount: double.parse(_amountController.text),
         categoryId: _selectedCategory!.id,
         type: _transactionType,
         date: transactionDate,
-        description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+        description: _descriptionController.text.isEmpty
+            ? null
+            : _descriptionController.text,
         paymentMethod: _selectedPaymentMethod,
       );
 
       final transactionNotifier = ref.read(transactionNotifierProvider.notifier);
       try {
-        await transactionNotifier.addTransaction(newTransaction);
+        await transactionNotifier.updateTransaction(updatedTransaction);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Transaction added successfully!')),
+          const SnackBar(content: Text('Transaction updated successfully!')),
         );
         Navigator.of(context).pop();
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add transaction: $e')),
+          SnackBar(content: Text('Failed to update transaction: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteTransaction() async {
+    final bool? confirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Transaction'),
+        content: const Text('Are you sure you want to delete this transaction?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final transactionNotifier = ref.read(transactionNotifierProvider.notifier);
+      try {
+        await transactionNotifier.deleteTransaction(widget.transaction.id);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Transaction deleted successfully!')),
+        );
+        Navigator.of(context).pop();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete transaction: $e')),
         );
       }
     }
@@ -122,8 +184,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Transaction'),
+        title: const Text('Edit Transaction'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _deleteTransaction,
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -186,15 +254,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Category Selector
                   CategorySelector(
                     selectedCategory: _selectedCategory,
                     onCategorySelected: _onCategorySelected,
                     selectedTransactionType: _transactionType,
-
-
-
                   ),
                   const SizedBox(height: 20),
 
