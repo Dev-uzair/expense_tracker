@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
 part 'budget.g.dart';
 
 @HiveType(typeId: 2)
-class Budget extends HiveObject {
+class Budget extends HiveObject with EquatableMixin {
   @HiveField(0)
   final String id;
 
@@ -46,4 +47,7 @@ class Budget extends HiveObject {
       endDate: DateTime.parse(json['endDate']),
     );
   }
+
+  @override
+  List<Object?> get props => [id, amount, category, startDate, endDate];
 }

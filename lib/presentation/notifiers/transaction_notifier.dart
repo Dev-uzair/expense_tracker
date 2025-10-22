@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:expense_tracker/domain/repositories/transaction_repository.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/presentation/providers/providers.dart';
 

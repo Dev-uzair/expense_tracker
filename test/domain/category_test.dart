@@ -7,6 +7,7 @@ void main() {
       final category = Category(
         id: '1',
         name: 'Food',
+        type: ''
       );
 
       final json = category.toJson();

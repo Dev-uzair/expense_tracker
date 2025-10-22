@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
 part 'transaction.g.dart';
 
 @HiveType(typeId: 0)
-class Transaction extends HiveObject {
+class Transaction extends HiveObject with EquatableMixin {
   @HiveField(0)
   final String id;
 
@@ -27,6 +28,22 @@ class Transaction extends HiveObject {
     required this.date,
   });
 
+  Transaction copyWith({
+    String? id,
+    double? amount,
+    String? category,
+    String? type,
+    DateTime? date,
+  }) {
+    return Transaction(
+      id: id ?? this.id,
+      amount: amount ?? this.amount,
+      category: category ?? this.category,
+      type: type ?? this.type,
+      date: date ?? this.date,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -46,4 +63,7 @@ class Transaction extends HiveObject {
       date: DateTime.parse(json['date']),
     );
   }
+
+  @override
+  List<Object?> get props => [id, amount, category, type, date];
 }
