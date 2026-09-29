@@ -41,7 +41,7 @@ class Budget extends HiveObject with EquatableMixin {
   factory Budget.fromJson(Map<String, dynamic> json) {
     return Budget(
       id: json['id'],
-      amount: json['amount'],
+      amount: (json['amount'] as num).toDouble(),
       category: json['category'],
       startDate: DateTime.parse(json['startDate']),
       endDate: DateTime.parse(json['endDate']),

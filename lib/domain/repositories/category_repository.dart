@@ -6,4 +6,5 @@ abstract class CategoryRepository {
   Future<void> deleteCategory(String id);
   Future<Category?> getCategory(String id);
   Future<List<Category>> getAllCategories();
+  Future<void> deleteAllCategories();
 }

@@ -25,8 +25,22 @@ Both are rebuilt and published automatically on every push to `main`, so the lin
 **Installing the APK:** open the link on your Android phone, download the file and tap it. Android will ask you to allow installing apps from your browser ("Install unknown apps").
 
 **Notes:**
-- The APK is signed with a debug key, so a newer build won't install over an older one. Uninstall the old version first (this deletes its data).
+- Releases are signed with the app's own key (when the signing secrets below are set up), so a new version installs over the old one and keeps your data. If a release says it used a *debug key*, uninstall the old version first.
 - The web version stores data in your browser, so it isn't shared between devices or browsers.
+- Use **⋮ → Back up data** to save everything to a `.json` file, and **⋮ → Restore from backup** to load it again, e.g. on a new phone or before reinstalling.
+
+### Setting up the APK signing key (maintainers, one time)
+
+1. Create a key (keep the file and passwords safe, since losing them means users must reinstall):
+   ```sh
+   keytool -genkeypair -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+   ```
+2. In **Settings → Secrets and variables → Actions → New repository secret**, add:
+   - `ANDROID_KEYSTORE_BASE64`: output of `base64 -i upload-keystore.jks` (macOS) or `base64 -w0 upload-keystore.jks` (Linux)
+   - `ANDROID_KEYSTORE_PASSWORD`: the keystore password
+   - `ANDROID_KEY_ALIAS`: `upload`
+   - `ANDROID_KEY_PASSWORD`: the key password (same as the keystore password unless you chose a different one)
+3. Never commit the `.jks` file; it is ignored by `android/.gitignore`.
 
 ## ✨ Features
 

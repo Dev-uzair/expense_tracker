@@ -65,6 +65,10 @@ class HiveDatabase {
     return categoryBox.values.toList();
   }
 
+  Future<void> deleteAllCategories() async {
+    await categoryBox.clear();
+  }
+
   // CRUD operations for Budget
   Future<void> addBudget(Budget budget) async {
     await budgetBox.put(budget.id, budget);

@@ -176,6 +176,16 @@ class MockHiveDatabase extends _i1.Mock implements _i3.HiveDatabase {
       ) as List<_i5.Category>);
 
   @override
+  _i7.Future<void> deleteAllCategories() => (super.noSuchMethod(
+        Invocation.method(
+          #deleteAllCategories,
+          [],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+
+  @override
   _i7.Future<void> addBudget(_i6.Budget? budget) => (super.noSuchMethod(
         Invocation.method(
           #addBudget,

@@ -73,7 +73,7 @@ class Transaction extends HiveObject with EquatableMixin {
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
       id: json['id'],
-      amount: json['amount'],
+      amount: (json['amount'] as num).toDouble(),
       categoryId: json['categoryId'],
       type: json['type'],
       date: DateTime.parse(json['date']),

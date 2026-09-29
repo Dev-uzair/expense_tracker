@@ -25,6 +25,11 @@ class TestCategoryRepository implements CategoryRepository {
   }
 
   @override
+  Future<void> deleteAllCategories() async {
+    _categories.clear();
+  }
+
+  @override
   Future<Category?> getCategory(String id) async {
     return _categories.firstWhere((c) => c.id == id);
   }

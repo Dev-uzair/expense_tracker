@@ -23,6 +23,11 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   @override
+  Future<void> deleteAllCategories() {
+    return _hiveDatabase.deleteAllCategories();
+  }
+
+  @override
   Future<Category?> getCategory(String id) {
     return Future.value(_hiveDatabase.getCategory(id));
   }

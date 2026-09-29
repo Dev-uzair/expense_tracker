@@ -62,6 +62,9 @@ class InMemoryCategoryRepository implements CategoryRepository {
   Future<void> deleteCategory(String id) async => items.remove(id);
 
   @override
+  Future<void> deleteAllCategories() async => items.clear();
+
+  @override
   Future<Category?> getCategory(String id) async => items[id];
 
   @override
