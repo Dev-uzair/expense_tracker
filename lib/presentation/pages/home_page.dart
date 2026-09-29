@@ -1,8 +1,12 @@
+import 'package:expense_tracker/presentation/notifiers/category_notifier.dart';
 import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart';
+import 'package:expense_tracker/data/backup_service.dart';
+import 'package:expense_tracker/presentation/providers/backup_providers.dart';
 import 'package:expense_tracker/presentation/pages/edit_transaction_screen.dart';
 import 'package:expense_tracker/presentation/pages/transaction_list_screen.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/presentation/pages/category_list_page.dart';
 import 'package:expense_tracker/presentation/widgets/balance_summary_card.dart';
@@ -70,6 +74,77 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  void _showMessage(String text) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  Future<void> _backUp() async {
+    try {
+      final json = await ref.read(backupServiceProvider).exportJson();
+      final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final saved = await ref
+          .read(backupFilesProvider)
+          .save('expense_tracker_backup_$date.json', json);
+      if (saved && mounted) _showMessage('Backup saved');
+    } catch (e) {
+      if (mounted) _showMessage('Backup failed: $e');
+    }
+  }
+
+  Future<void> _restore() async {
+    final String? contents;
+    try {
+      contents = await ref.read(backupFilesProvider).pickText();
+    } catch (e) {
+      if (mounted) _showMessage('Could not open file: $e');
+      return;
+    }
+    if (contents == null || !mounted) return;
+
+    try {
+      BackupService.parse(contents);
+    } on FormatException catch (e) {
+      _showMessage(e.message);
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Restore from backup?'),
+        content: const Text(
+            'This replaces all current transactions and categories with the '
+            'ones in the backup file.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Restore'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      final summary =
+          await ref.read(backupServiceProvider).importJson(contents);
+      ref.invalidate(transactionNotifierProvider);
+      ref.invalidate(categoryNotifierProvider);
+      if (mounted) {
+        _showMessage('Restored ${summary.transactions} transactions and '
+            '${summary.categories} categories');
+      }
+    } catch (e) {
+      if (mounted) _showMessage('Restore failed: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,9 +154,33 @@ class _HomePageState extends ConsumerState<HomePage> {
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'clear') _confirmClearAll();
+              switch (value) {
+                case 'backup':
+                  _backUp();
+                case 'restore':
+                  _restore();
+                case 'clear':
+                  _confirmClearAll();
+              }
             },
             itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'backup',
+                child: ListTile(
+                  leading: Icon(Icons.download),
+                  title: Text('Back up data'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuItem(
+                value: 'restore',
+                child: ListTile(
+                  leading: Icon(Icons.upload_file),
+                  title: Text('Restore from backup'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuDivider(),
               PopupMenuItem(
                 value: 'clear',
                 child: ListTile(

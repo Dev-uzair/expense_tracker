@@ -32,6 +32,16 @@ void main() {
       verifyNoMoreInteractions(mockHiveDatabase);
     });
 
+
+    test('should call deleteAllCategories on the database', () async {
+      // arrange
+      when(mockHiveDatabase.deleteAllCategories()).thenAnswer((_) async => {});
+      // act
+      await categoryRepository.deleteAllCategories();
+      // assert
+      verify(mockHiveDatabase.deleteAllCategories());
+      verifyNoMoreInteractions(mockHiveDatabase);
+    });
     test('should call deleteCategory on the database', () async {
       // arrange
       when(mockHiveDatabase.deleteCategory(any)).thenAnswer((_) async => {});
