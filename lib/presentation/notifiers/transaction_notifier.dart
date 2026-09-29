@@ -40,6 +40,11 @@ class TransactionNotifier extends AsyncNotifier<List<Transaction>> {
     }
     await _reload();
   }
+
+  Future<void> deleteAllTransactions() async {
+    await ref.read(transactionRepositoryProvider).deleteAllTransactions();
+    await _reload();
+  }
 }
 
 final transactionNotifierProvider =

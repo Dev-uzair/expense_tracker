@@ -23,6 +23,11 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
+  Future<void> deleteAllTransactions() {
+    return _hiveDatabase.deleteAllTransactions();
+  }
+
+  @override
   Future<Transaction?> getTransaction(String id) {
     return Future.value(_hiveDatabase.getTransaction(id));
   }

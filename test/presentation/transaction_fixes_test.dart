@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:expense_tracker/core/category_icons.dart';
 import 'package:expense_tracker/domain/category.dart';
-import 'package:expense_tracker/domain/repositories/category_repository.dart';
-import 'package:expense_tracker/domain/repositories/transaction_repository.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/presentation/notifiers/category_notifier.dart';
 import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart';
@@ -17,71 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
-class InMemoryTransactionRepository implements TransactionRepository {
-  final Map<String, Transaction> items = {};
-  bool failWrites = false;
-  // When set, deletes wait on it, like a real disk write that finishes after
-  // the next frame.
-  Completer<void>? deleteGate;
-
-  void _check() {
-    if (failWrites) throw Exception('disk full');
-  }
-
-  @override
-  Future<void> addTransaction(Transaction t) async {
-    _check();
-    items[t.id] = t;
-  }
-
-  @override
-  Future<void> updateTransaction(Transaction t) async {
-    _check();
-    items[t.id] = t;
-  }
-
-  @override
-  Future<void> deleteTransaction(String id) async {
-    await deleteGate?.future;
-    _check();
-    items.remove(id);
-  }
-
-  @override
-  Future<Transaction?> getTransaction(String id) async => items[id];
-
-  @override
-  Future<List<Transaction>> getAllTransactions() async => items.values.toList();
-}
-
-class InMemoryCategoryRepository implements CategoryRepository {
-  final Map<String, Category> items = {};
-
-  @override
-  Future<void> addCategory(Category c) async => items[c.id] = c;
-
-  @override
-  Future<void> updateCategory(Category c) async => items[c.id] = c;
-
-  @override
-  Future<void> deleteCategory(String id) async => items.remove(id);
-
-  @override
-  Future<Category?> getCategory(String id) async => items[id];
-
-  @override
-  Future<List<Category>> getAllCategories() async => items.values.toList();
-}
-
-Transaction makeTransaction(String id, {String? description}) => Transaction(
-      id: id,
-      amount: 10,
-      categoryId: 'c1',
-      type: 'expense',
-      date: DateTime(2026, 9, 1, 12),
-      description: description,
-      paymentMethod: 'Cash',
-    );
+import '../helpers/fake_repositories.dart';
 
 void main() {
   late InMemoryTransactionRepository txRepo;

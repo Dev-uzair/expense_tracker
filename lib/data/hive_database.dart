@@ -40,6 +40,10 @@ class HiveDatabase {
     return transactionBox.values.toList();
   }
 
+  Future<void> deleteAllTransactions() async {
+    await transactionBox.clear();
+  }
+
   // CRUD operations for Category
   Future<void> addCategory(Category category) async {
     await categoryBox.put(category.id, category);

@@ -46,6 +46,16 @@ void main() {
       verifyNoMoreInteractions(mockHiveDatabase);
     });
 
+    test('should call deleteAllTransactions on the database', () async {
+      // arrange
+      when(mockHiveDatabase.deleteAllTransactions()).thenAnswer((_) async => {});
+      // act
+      await transactionRepository.deleteAllTransactions();
+      // assert
+      verify(mockHiveDatabase.deleteAllTransactions());
+      verifyNoMoreInteractions(mockHiveDatabase);
+    });
+
     test('should return a list of transactions from the database', () async {
       // arrange
       when(mockHiveDatabase.getAllTransactions()).thenReturn([tTransaction]);
