@@ -3,6 +3,7 @@ import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart
 import 'package:expense_tracker/data/backup_service.dart';
 import 'package:expense_tracker/presentation/providers/backup_providers.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
+import 'package:expense_tracker/presentation/pages/analytics_page.dart';
 import 'package:expense_tracker/presentation/pages/edit_transaction_screen.dart';
 import 'package:expense_tracker/presentation/pages/transaction_list_screen.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
@@ -11,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/presentation/pages/category_list_page.dart';
 import 'package:expense_tracker/presentation/widgets/balance_summary_card.dart';
+import 'package:expense_tracker/presentation/widgets/month_selector.dart';
 import 'package:expense_tracker/presentation/widgets/quick_stats_card.dart';
 import 'package:expense_tracker/presentation/widgets/transaction_list_item.dart';
 
@@ -29,6 +31,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardPage(),
     TransactionListScreen(),
+    AnalyticsPage(),
     CategoryListPage(),
   ];
 
@@ -219,6 +222,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             )
           : null,
       bottomNavigationBar: BottomNavigationBar(
+        // Four items would otherwise switch to the "shifting" style.
+        type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
@@ -227,6 +232,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: 'Transactions',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Analytics',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.category),
@@ -251,9 +260,6 @@ class DashboardPage extends ConsumerWidget {
     final dataAsync = ref.watch(transactionWithCategoryProvider);
     final month = ref.watch(selectedMonthProvider);
     final nextMonth = DateTime(month.year, month.month + 1);
-    final now = DateTime.now();
-    final isCurrentMonth = month.year == now.year && month.month == now.month;
-    final monthLabel = DateFormat.yMMMM().format(month);
 
     return dataAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -279,36 +285,9 @@ class DashboardPage extends ConsumerWidget {
         return SingleChildScrollView(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      tooltip: 'Previous month',
-                      icon: const Icon(Icons.chevron_left),
-                      onPressed: () =>
-                          ref.read(selectedMonthProvider.notifier).previous(),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: Text(
-                        monthLabel,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: 'Next month',
-                      icon: const Icon(Icons.chevron_right),
-                      // No point looking at months that haven't happened yet.
-                      onPressed: isCurrentMonth
-                          ? null
-                          : () =>
-                                ref.read(selectedMonthProvider.notifier).next(),
-                    ),
-                  ],
-                ),
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: MonthSelector(),
               ),
               BalanceSummaryCard(
                 title: 'Balance this month',
