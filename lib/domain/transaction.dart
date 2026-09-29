@@ -36,14 +36,16 @@ class Transaction extends HiveObject with EquatableMixin {
     this.paymentMethod, // Made optional
   });
 
+  // Nullable fields take a function so callers can clear them:
+  // copyWith(description: () => null).
   Transaction copyWith({
     String? id,
     double? amount,
     String? categoryId,
     String? type,
     DateTime? date,
-    String? description,
-    String? paymentMethod,
+    String? Function()? description,
+    String? Function()? paymentMethod,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -51,8 +53,8 @@ class Transaction extends HiveObject with EquatableMixin {
       categoryId: categoryId ?? this.categoryId,
       type: type ?? this.type,
       date: date ?? this.date,
-      description: description ?? this.description,
-      paymentMethod: paymentMethod ?? this.paymentMethod,
+      description: description != null ? description() : this.description,
+      paymentMethod: paymentMethod != null ? paymentMethod() : this.paymentMethod,
     );
   }
 

@@ -120,10 +120,10 @@ class _EditTransactionScreenState extends ConsumerState<EditTransactionScreen> {
         categoryId: _selectedCategory!.id,
         type: _transactionType,
         date: transactionDate,
-        description: _descriptionController.text.isEmpty
+        description: () => _descriptionController.text.isEmpty
             ? null
             : _descriptionController.text,
-        paymentMethod: _selectedPaymentMethod,
+        paymentMethod: () => _selectedPaymentMethod,
       );
 
       final transactionNotifier = ref.read(transactionNotifierProvider.notifier);
