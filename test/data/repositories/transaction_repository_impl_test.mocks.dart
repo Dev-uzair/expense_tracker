@@ -119,6 +119,16 @@ class MockHiveDatabase extends _i1.Mock implements _i3.HiveDatabase {
       ) as List<_i4.Transaction>);
 
   @override
+  _i7.Future<void> deleteAllTransactions() => (super.noSuchMethod(
+        Invocation.method(
+          #deleteAllTransactions,
+          [],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
+
+  @override
   _i7.Future<void> addCategory(_i5.Category? category) => (super.noSuchMethod(
         Invocation.method(
           #addCategory,

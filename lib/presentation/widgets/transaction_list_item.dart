@@ -7,11 +7,13 @@ import 'package:intl/intl.dart';
 class TransactionListItem extends StatelessWidget {
   final Transaction transaction;
   final Category? category;
+  final VoidCallback? onTap;
 
   const TransactionListItem({
     super.key,
     required this.transaction,
     this.category,
+    this.onTap,
   });
 
   @override
@@ -22,6 +24,7 @@ class TransactionListItem extends StatelessWidget {
         '${isExpense ? '-' : '+'}\$${transaction.amount.toStringAsFixed(2)}';
 
     return ListTile(
+      onTap: onTap,
       leading: Icon(categoryIconData(category?.categoryIcon)),
       title: Text(transaction.description ?? 'N/A'),
       subtitle: Text(DateFormat.yMd().add_jm().format(transaction.date)),

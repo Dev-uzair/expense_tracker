@@ -25,6 +25,11 @@ class TestTransactionRepository implements TransactionRepository {
   }
 
   @override
+  Future<void> deleteAllTransactions() async {
+    _transactions.clear();
+  }
+
+  @override
   Future<Transaction?> getTransaction(String id) async {
     return _transactions.firstWhere((t) => t.id == id);
   }

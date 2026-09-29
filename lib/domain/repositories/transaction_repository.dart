@@ -6,4 +6,5 @@ abstract class TransactionRepository {
   Future<void> deleteTransaction(String id);
   Future<Transaction?> getTransaction(String id);
   Future<List<Transaction>> getAllTransactions();
+  Future<void> deleteAllTransactions();
 }
