@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:expense_tracker/core/category_icons.dart';
 import 'package:expense_tracker/domain/category.dart';
-import 'package:expense_tracker/presentation/providers/providers.dart';
 import 'package:expense_tracker/presentation/notifiers/category_notifier.dart';
 
 class CategorySelector extends ConsumerWidget {
@@ -54,10 +53,7 @@ class CategorySelector extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        category.categoryIcon != null
-                            ? IconData(int.parse(category.categoryIcon!),
-                                fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons')
-                            : CupertinoIcons.question_circle,
+                        categoryIconData(category.categoryIcon),
                         color: isSelected ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onSurface,
                       ),
                       const SizedBox(height: 8),

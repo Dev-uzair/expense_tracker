@@ -1,8 +1,6 @@
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
 import 'package:expense_tracker/presentation/pages/edit_transaction_screen.dart';
-import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/domain/transaction.dart';
-import 'package:expense_tracker/presentation/providers/providers.dart';
 import 'package:expense_tracker/presentation/widgets/empty_state_widget.dart';
 import 'package:expense_tracker/presentation/widgets/transaction_list_item.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +23,9 @@ class TransactionItem extends ListItem {
 }
 
 bool isSameDay(DateTime date1, DateTime date2) {
-  return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+  return date1.year == date2.year &&
+      date1.month == date2.month &&
+      date1.day == date2.day;
 }
 
 class TransactionListScreen extends ConsumerWidget {
@@ -36,9 +36,7 @@ class TransactionListScreen extends ConsumerWidget {
     final transactionsAsyncValue = ref.watch(transactionWithCategoryProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transactions'),
-      ),
+      appBar: AppBar(title: const Text('Transactions')),
       body: transactionsAsyncValue.when(
         data: (data) {
           final (transactions, categoryMap) = data;
@@ -64,7 +62,8 @@ class TransactionListScreen extends ConsumerWidget {
 
             dailyTotals.update(
               date,
-              (value) => value + (tx.type == 'expense' ? -tx.amount : tx.amount),
+              (value) =>
+                  value + (tx.type == 'expense' ? -tx.amount : tx.amount),
               ifAbsent: () => (tx.type == 'expense' ? -tx.amount : tx.amount),
             );
           }
@@ -75,11 +74,13 @@ class TransactionListScreen extends ConsumerWidget {
           final items = <ListItem>[];
           for (var date in sortedDates) {
             items.add(DateSeparatorItem(date, dailyTotals[date]!));
-            items.addAll(groupedTransactions[date]!.map((tx) => TransactionItem(tx)));
+            items.addAll(
+              groupedTransactions[date]!.map((tx) => TransactionItem(tx)),
+            );
           }
 
           return RefreshIndicator(
-            onRefresh: () => ref.refresh(transactionWithCategoryProvider.future),
+            onRefresh: () => ref.refresh(transactionNotifierProvider.future),
             child: ListView.builder(
               itemCount: items.length,
               itemBuilder: (context, index) {
@@ -108,23 +109,49 @@ class TransactionListScreen extends ConsumerWidget {
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
                       final deletedTransaction = item.transaction;
-                      ref
-                          .read(transactionNotifierProvider.notifier)
-                          .deleteTransaction(item.transaction.id);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('Transaction deleted'),
-                          action: SnackBarAction(
-                            label: 'Undo',
-                            onPressed: () {
-                              ref
-                                  .read(transactionNotifierProvider.notifier)
-                                  .addTransaction(deletedTransaction);
-                            },
-                          ),
-                        ),
+                      // Captured up front: the undo callback can fire after
+                      // this screen (and its ref) has been disposed.
+                      final notifier = ref.read(
+                        transactionNotifierProvider.notifier,
                       );
+                      final messenger = ScaffoldMessenger.of(context);
+
+                      notifier
+                          .deleteTransaction(deletedTransaction.id)
+                          .then(
+                            (_) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: const Text('Transaction deleted'),
+                                  action: SnackBarAction(
+                                    label: 'Undo',
+                                    onPressed: () {
+                                      notifier
+                                          .addTransaction(deletedTransaction)
+                                          .catchError((Object e) {
+                                            messenger.showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Failed to restore transaction: $e',
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            onError: (Object e) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to delete transaction: $e',
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                     },
                     background: Container(
                       color: Colors.red,

@@ -1,6 +1,6 @@
+import 'package:expense_tracker/core/category_icons.dart';
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/domain/transaction.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -22,10 +22,7 @@ class TransactionListItem extends StatelessWidget {
         '${isExpense ? '-' : '+'}\$${transaction.amount.toStringAsFixed(2)}';
 
     return ListTile(
-      leading: category?.categoryIcon != null
-          ? Icon(IconData(int.parse(category!.categoryIcon!),
-              fontFamily: 'CupertinoIcons', fontPackage: 'cupertino_icons'))
-          : const Icon(CupertinoIcons.question_circle),
+      leading: Icon(categoryIconData(category?.categoryIcon)),
       title: Text(transaction.description ?? 'N/A'),
       subtitle: Text(DateFormat.yMd().add_jm().format(transaction.date)),
       trailing: Text(
