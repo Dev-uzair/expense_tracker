@@ -27,8 +27,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Pinned so a new Flutter release can't raise the Android toolchain
+      # minimums (Gradle/AGP/Kotlin) out from under the build.
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: 3.47.5
           channel: stable
           cache: true
 
