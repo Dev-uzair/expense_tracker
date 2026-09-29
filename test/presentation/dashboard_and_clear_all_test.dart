@@ -1,6 +1,7 @@
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart';
 import 'package:expense_tracker/presentation/pages/home_page.dart';
+import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +30,9 @@ void main() {
         overrides: [
           transactionRepositoryProvider.overrideWithValue(txRepo),
           categoryRepositoryProvider.overrideWithValue(catRepo),
+          selectedMonthProvider.overrideWith(
+            () => FixedMonthNotifier(DateTime(2026, 9)),
+          ),
         ],
         child: const MaterialApp(home: HomePage()),
       ),
@@ -76,7 +80,46 @@ void main() {
   ) async {
     await pumpHome(tester);
     expect(find.text('0.00'), findsNWidgets(3));
-    expect(find.text('No transactions yet. Tap + to add one.'), findsOneWidget);
+    expect(
+      find.text('No transactions this month. Tap + to add one.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('dashboard only counts the selected month', (tester) async {
+    txRepo.items
+      ..['sep'] = makeTransaction(
+        'sep',
+        description: 'September rent',
+        amount: 500,
+        date: DateTime(2026, 9, 3),
+      )
+      ..['aug'] = makeTransaction(
+        'aug',
+        description: 'August rent',
+        amount: 450,
+        date: DateTime(2026, 8, 3),
+      )
+      ..['oct'] = makeTransaction(
+        'oct',
+        description: 'October rent',
+        amount: 999,
+        date: DateTime(2026, 10, 1),
+      );
+    await pumpHome(tester);
+
+    expect(find.text('September 2026'), findsOneWidget);
+    expect(find.text('September rent'), findsOneWidget);
+    expect(find.text('August rent'), findsNothing);
+    expect(find.text('-500.00'), findsOneWidget); // balance
+    expect(find.text('500.00'), findsOneWidget); // expense
+
+    await tester.tap(find.byTooltip('Previous month'));
+    await tester.pumpAndSettle();
+    expect(find.text('August 2026'), findsOneWidget);
+    expect(find.text('August rent'), findsOneWidget);
+    expect(find.text('September rent'), findsNothing);
+    expect(find.text('450.00'), findsOneWidget);
   });
 
   testWidgets('clear all transactions asks first, then empties everything', (
