@@ -1,6 +1,7 @@
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/presentation/pages/home_page.dart';
 import 'package:expense_tracker/presentation/providers/backup_providers.dart';
+import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,6 +48,9 @@ void main() {
         overrides: [
           transactionRepositoryProvider.overrideWithValue(txRepo),
           categoryRepositoryProvider.overrideWithValue(catRepo),
+          selectedMonthProvider.overrideWith(
+            () => FixedMonthNotifier(DateTime(2026, 9)),
+          ),
           backupFilesProvider.overrideWithValue(files),
         ],
         child: const MaterialApp(home: HomePage()),

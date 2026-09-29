@@ -5,6 +5,7 @@ import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/domain/repositories/category_repository.dart';
 import 'package:expense_tracker/domain/repositories/transaction_repository.dart';
 import 'package:expense_tracker/domain/transaction.dart';
+import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 
 class InMemoryTransactionRepository implements TransactionRepository {
   final Map<String, Transaction> items = {};
@@ -86,3 +87,13 @@ Transaction makeTransaction(
   description: description,
   paymentMethod: 'Cash',
 );
+
+// Pins the dashboard month so tests don't depend on today's date.
+class FixedMonthNotifier extends SelectedMonthNotifier {
+  final DateTime month;
+
+  FixedMonthNotifier(this.month);
+
+  @override
+  DateTime build() => month;
+}
