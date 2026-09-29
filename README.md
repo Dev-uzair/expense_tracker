@@ -4,6 +4,7 @@ A Flutter-based mobile application designed to help users track expenses, manage
 
 ## Table of Contents
 
+- [Try the App](#-try-the-app)
 - [Features](#-features)
 - [Screenshots](#-screenshots)
 - [Tech-Stack](#️-tech-stack)
@@ -11,6 +12,21 @@ A Flutter-based mobile application designed to help users track expenses, manage
 - [Getting-Started](#-getting-started)
 - [Contributing](#-contributing)
 - [License](#-license)
+
+## 📲 Try the App
+
+| Platform | Link |
+| :--- | :--- |
+| 🌐 **Web** (runs in your browser) | [dev-uzair.github.io/expense_tracker](https://dev-uzair.github.io/expense_tracker/) |
+| 🤖 **Android** (APK download) | [expense-tracker.apk](https://github.com/Dev-uzair/expense_tracker/releases/latest/download/expense-tracker.apk) |
+
+Both are rebuilt and published automatically on every push to `main`, so the links always point to the latest version. All builds are listed on the [Releases](https://github.com/Dev-uzair/expense_tracker/releases) page.
+
+**Installing the APK:** open the link on your Android phone, download the file and tap it. Android will ask you to allow installing apps from your browser ("Install unknown apps").
+
+**Notes:**
+- The APK is signed with a debug key, so a newer build won't install over an older one. Uninstall the old version first (this deletes its data).
+- The web version stores data in your browser, so it isn't shared between devices or browsers.
 
 ## ✨ Features
 
