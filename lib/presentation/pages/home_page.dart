@@ -4,11 +4,17 @@ import 'package:expense_tracker/data/backup_service.dart';
 import 'package:expense_tracker/presentation/providers/backup_providers.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/pages/analytics_page.dart';
+import 'package:expense_tracker/presentation/pages/budgets_page.dart';
 import 'package:expense_tracker/presentation/pages/category_form_screen.dart';
 import 'package:expense_tracker/presentation/pages/settings_page.dart';
 import 'package:expense_tracker/presentation/pages/transaction_form_screen.dart';
 import 'package:expense_tracker/presentation/pages/transaction_list_screen.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
+import 'package:expense_tracker/domain/category.dart';
+import 'package:expense_tracker/domain/transaction.dart';
+import 'package:expense_tracker/presentation/budgets/budget_data.dart';
+import 'package:expense_tracker/presentation/notifiers/budget_notifier.dart';
+import 'package:expense_tracker/presentation/widgets/budget_meter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -130,8 +136,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       builder: (context) => AlertDialog(
         title: const Text('Restore from backup?'),
         content: const Text(
-          'This replaces all current transactions and categories with the '
-          'ones in the backup file.',
+          'This replaces all current transactions, categories and budgets '
+          'with the ones in the backup file.',
         ),
         actions: [
           TextButton(
@@ -153,6 +159,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           .importJson(contents);
       ref.invalidate(transactionNotifierProvider);
       ref.invalidate(categoryNotifierProvider);
+      ref.invalidate(budgetNotifierProvider);
       if (mounted) {
         _showMessage(
           'Restored ${summary.transactions} transactions and '
@@ -174,6 +181,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
+                case 'budgets':
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const BudgetsPage()),
+                  );
                 case 'settings':
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const SettingsPage()),
@@ -187,6 +198,14 @@ class _HomePageState extends ConsumerState<HomePage> {
               }
             },
             itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'budgets',
+                child: ListTile(
+                  leading: Icon(Icons.savings_outlined),
+                  title: Text('Budgets'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
               PopupMenuItem(
                 value: 'settings',
                 child: ListTile(
@@ -342,6 +361,11 @@ class DashboardPage extends ConsumerWidget {
                   ],
                 ),
               ),
+              _DashboardBudgets(
+                transactions: allTransactions,
+                categories: categoryMap,
+                month: month,
+              ),
               const SizedBox(height: 20),
               Text(
                 'Recent Transactions',
@@ -373,6 +397,67 @@ class DashboardPage extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// This month's budgets on the dashboard, or a prompt to create one.
+class _DashboardBudgets extends ConsumerWidget {
+  final List<Transaction> transactions;
+  final Map<String, Category> categories;
+  final DateTime month;
+
+  const _DashboardBudgets({
+    required this.transactions,
+    required this.categories,
+    required this.month,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final budgets = ref.watch(budgetNotifierProvider).value ?? const [];
+    final statuses = budgetStatuses(budgets, transactions, categories, month);
+    void openBudgets() => Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const BudgetsPage()));
+
+    if (statuses.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: TextButton.icon(
+          onPressed: openBudgets,
+          icon: const Icon(Icons.savings_outlined),
+          label: const Text('Set a monthly budget'),
+        ),
+      );
+    }
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 4, 0),
+              child: Row(
+                children: [
+                  Text(
+                    'Budgets',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: openBudgets,
+                    child: const Text('Manage'),
+                  ),
+                ],
+              ),
+            ),
+            for (final s in statuses) BudgetMeter(status: s),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -9,6 +9,7 @@ import '../helpers/fake_repositories.dart';
 void main() {
   late InMemoryTransactionRepository txRepo;
   late InMemoryCategoryRepository catRepo;
+  late InMemoryBudgetRepository budgetRepo;
   late BackupService service;
 
   setUp(() {
@@ -20,7 +21,8 @@ void main() {
         type: 'expense',
         categoryIcon: 'food',
       );
-    service = BackupService(txRepo, catRepo);
+    budgetRepo = InMemoryBudgetRepository();
+    service = BackupService(txRepo, catRepo, budgetRepo);
   });
 
   test('export then import restores the same data', () async {

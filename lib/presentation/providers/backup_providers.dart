@@ -10,6 +10,7 @@ final backupServiceProvider = Provider<BackupService>((ref) {
   return BackupService(
     ref.watch(transactionRepositoryProvider),
     ref.watch(categoryRepositoryProvider),
+    ref.watch(budgetRepositoryProvider),
   );
 });
 

@@ -48,6 +48,7 @@ void main() {
         overrides: [
           transactionRepositoryProvider.overrideWithValue(txRepo),
           categoryRepositoryProvider.overrideWithValue(catRepo),
+          budgetRepositoryProvider.overrideWithValue(InMemoryBudgetRepository()),
           selectedMonthProvider.overrideWith(
             () => FixedMonthNotifier(DateTime(2026, 9)),
           ),

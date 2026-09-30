@@ -141,6 +141,7 @@ void main() {
           overrides: [
             transactionRepositoryProvider.overrideWithValue(txRepo),
             categoryRepositoryProvider.overrideWithValue(catRepo),
+            budgetRepositoryProvider.overrideWithValue(InMemoryBudgetRepository()),
           ],
           child: const MaterialApp(home: TransactionListScreen()),
         ),

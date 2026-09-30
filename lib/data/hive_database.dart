@@ -89,4 +89,8 @@ class HiveDatabase {
   List<Budget> getAllBudgets() {
     return budgetBox.values.toList();
   }
+
+  Future<void> deleteAllBudgets() async {
+    await budgetBox.clear();
+  }
 }

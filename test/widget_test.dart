@@ -19,6 +19,7 @@ void main() {
             InMemoryTransactionRepository(),
           ),
           categoryRepositoryProvider.overrideWithValue(catRepo),
+          budgetRepositoryProvider.overrideWithValue(InMemoryBudgetRepository()),
         ],
         child: const MyApp(),
       ),

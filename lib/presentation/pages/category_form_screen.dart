@@ -1,5 +1,6 @@
 import 'package:expense_tracker/core/category_icons.dart';
 import 'package:expense_tracker/domain/category.dart';
+import 'package:expense_tracker/presentation/notifiers/budget_notifier.dart';
 import 'package:expense_tracker/presentation/notifiers/category_notifier.dart';
 import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart';
 import 'package:flutter/material.dart';
@@ -147,6 +148,9 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
             .read(transactionNotifierProvider.notifier)
             .reassignCategory(category.id, moveTo.id);
       }
+      await ref
+          .read(budgetNotifierProvider.notifier)
+          .deleteBudgetsForCategory(category.id);
       await ref
           .read(categoryNotifierProvider.notifier)
           .deleteCategory(category.id);

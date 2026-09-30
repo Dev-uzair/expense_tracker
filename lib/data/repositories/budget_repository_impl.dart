@@ -23,6 +23,11 @@ class BudgetRepositoryImpl implements BudgetRepository {
   }
 
   @override
+  Future<void> deleteAllBudgets() {
+    return _hiveDatabase.deleteAllBudgets();
+  }
+
+  @override
   Future<Budget?> getBudget(String id) {
     return Future.value(_hiveDatabase.getBudget(id));
   }

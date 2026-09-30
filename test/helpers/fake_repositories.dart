@@ -1,7 +1,9 @@
 // In-memory repositories and builders shared by presentation tests.
 import 'dart:async';
 
+import 'package:expense_tracker/domain/budget.dart';
 import 'package:expense_tracker/domain/category.dart';
+import 'package:expense_tracker/domain/repositories/budget_repository.dart';
 import 'package:expense_tracker/domain/repositories/category_repository.dart';
 import 'package:expense_tracker/domain/repositories/transaction_repository.dart';
 import 'package:expense_tracker/domain/transaction.dart';
@@ -96,4 +98,26 @@ class FixedMonthNotifier extends SelectedMonthNotifier {
 
   @override
   DateTime build() => month;
+}
+
+class InMemoryBudgetRepository implements BudgetRepository {
+  final Map<String, Budget> items = {};
+
+  @override
+  Future<void> addBudget(Budget b) async => items[b.id] = b;
+
+  @override
+  Future<void> updateBudget(Budget b) async => items[b.id] = b;
+
+  @override
+  Future<void> deleteBudget(String id) async => items.remove(id);
+
+  @override
+  Future<void> deleteAllBudgets() async => items.clear();
+
+  @override
+  Future<Budget?> getBudget(String id) async => items[id];
+
+  @override
+  Future<List<Budget>> getAllBudgets() async => items.values.toList();
 }
