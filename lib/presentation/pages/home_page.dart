@@ -4,6 +4,7 @@ import 'package:expense_tracker/data/backup_service.dart';
 import 'package:expense_tracker/presentation/providers/backup_providers.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/pages/analytics_page.dart';
+import 'package:expense_tracker/presentation/pages/category_form_screen.dart';
 import 'package:expense_tracker/presentation/pages/settings_page.dart';
 import 'package:expense_tracker/presentation/pages/transaction_form_screen.dart';
 import 'package:expense_tracker/presentation/pages/transaction_list_screen.dart';
@@ -225,21 +226,27 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
-      floatingActionButton:
-          _selectedIndex == 0 ||
-              _selectedIndex ==
-                  1 // Only show FAB on Dashboard and Transactions
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const TransactionFormScreen(),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
+      // Dashboard/Transactions add a transaction, Categories adds a
+      // category; Analytics has no add action.
+      floatingActionButton: switch (_selectedIndex) {
+        0 || 1 => FloatingActionButton(
+          tooltip: 'Add transaction',
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const TransactionFormScreen(),
+            ),
+          ),
+          child: const Icon(Icons.add),
+        ),
+        3 => FloatingActionButton(
+          tooltip: 'Add category',
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const CategoryFormScreen()),
+          ),
+          child: const Icon(Icons.add),
+        ),
+        _ => null,
+      },
       bottomNavigationBar: BottomNavigationBar(
         // Four items would otherwise switch to the "shifting" style.
         type: BottomNavigationBarType.fixed,
