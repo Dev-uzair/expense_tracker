@@ -14,13 +14,7 @@ void main() {
   });
 
   group('BudgetRepositoryImpl', () {
-    final tBudget = Budget(
-      id: '1',
-      amount: 500.0,
-      category: 'Food',
-      startDate: DateTime.now(),
-      endDate: DateTime.now().add(const Duration(days: 30)),
-    );
+    final tBudget = Budget(id: '1', amount: 500.0, categoryId: 'food');
 
     test('should call addBudget on the database', () async {
       // arrange

@@ -32,6 +32,7 @@ void main() {
     final container = ProviderContainer(overrides: [
       transactionRepositoryProvider.overrideWithValue(txRepo),
       categoryRepositoryProvider.overrideWithValue(catRepo),
+      budgetRepositoryProvider.overrideWithValue(InMemoryBudgetRepository()),
     ]);
     addTearDown(container.dispose);
     return container;
@@ -135,6 +136,7 @@ void main() {
       overrides: [
         transactionRepositoryProvider.overrideWithValue(txRepo),
         categoryRepositoryProvider.overrideWithValue(catRepo),
+        budgetRepositoryProvider.overrideWithValue(InMemoryBudgetRepository()),
       ],
       child: const MaterialApp(home: TransactionListScreen()),
     ));

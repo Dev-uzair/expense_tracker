@@ -229,4 +229,14 @@ class MockHiveDatabase extends _i1.Mock implements _i3.HiveDatabase {
         ),
         returnValue: <_i6.Budget>[],
       ) as List<_i6.Budget>);
+
+  @override
+  _i7.Future<void> deleteAllBudgets() => (super.noSuchMethod(
+        Invocation.method(
+          #deleteAllBudgets,
+          [],
+        ),
+        returnValue: _i7.Future<void>.value(),
+        returnValueForMissingStub: _i7.Future<void>.value(),
+      ) as _i7.Future<void>);
 }
