@@ -1,6 +1,7 @@
 import 'package:expense_tracker/presentation/notifiers/category_notifier.dart';
 import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart';
 import 'package:expense_tracker/data/backup_service.dart';
+import 'package:expense_tracker/data/csv_export.dart';
 import 'package:expense_tracker/presentation/providers/backup_providers.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/pages/analytics_page.dart';
@@ -14,6 +15,7 @@ import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/presentation/budgets/budget_data.dart';
 import 'package:expense_tracker/presentation/notifiers/budget_notifier.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 import 'package:expense_tracker/presentation/widgets/budget_meter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -114,6 +116,63 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  Future<void> _exportCsv() async {
+    final data = ref.read(transactionWithCategoryProvider).value;
+    if (data == null || data.$1.isEmpty) {
+      _showMessage('No transactions to export');
+      return;
+    }
+    final (all, categories) = data;
+    var transactions = all;
+
+    // Offer the Transactions tab's current filter as an option.
+    final filter = ref.read(transactionFilterProvider);
+    if (filter.isActive) {
+      final filtered = filter.apply(all, categories);
+      final choice = await showDialog<List<Transaction>>(
+        context: context,
+        builder: (context) => SimpleDialog(
+          title: const Text('Export which transactions?'),
+          children: [
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(all),
+              child: Text('All transactions (${all.length})'),
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(filtered),
+              child: Text(
+                'Only the filtered transactions (${filtered.length})',
+              ),
+            ),
+          ],
+        ),
+      );
+      if (choice == null || !mounted) return;
+      transactions = choice;
+    }
+
+    try {
+      final csv = transactionsToCsv(
+        transactions,
+        categories,
+        currencyCode: ref.read(settingsProvider).currency.code,
+      );
+      final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final saved = await ref
+          .read(backupFilesProvider)
+          .save(
+            'expense_tracker_transactions_$date.csv',
+            csv,
+            mimeType: 'text/csv',
+          );
+      if (saved && mounted) {
+        _showMessage('Exported ${transactions.length} transactions');
+      }
+    } catch (e) {
+      if (mounted) _showMessage('Export failed: $e');
+    }
+  }
+
   Future<void> _restore() async {
     final String? contents;
     try {
@@ -189,6 +248,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const SettingsPage()),
                   );
+                case 'export':
+                  _exportCsv();
                 case 'backup':
                   _backUp();
                 case 'restore':
@@ -215,6 +276,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
               PopupMenuDivider(),
+              PopupMenuItem(
+                value: 'export',
+                child: ListTile(
+                  leading: Icon(Icons.table_view_outlined),
+                  title: Text('Export to CSV'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
               PopupMenuItem(
                 value: 'backup',
                 child: ListTile(

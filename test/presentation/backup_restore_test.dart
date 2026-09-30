@@ -12,12 +12,18 @@ import '../helpers/fake_repositories.dart';
 class FakeBackupFiles implements BackupFiles {
   String? savedName;
   String? savedContents;
+  String? savedMimeType;
   String? toPick;
 
   @override
-  Future<bool> save(String fileName, String contents) async {
+  Future<bool> save(
+    String fileName,
+    String contents, {
+    String mimeType = 'application/json',
+  }) async {
     savedName = fileName;
     savedContents = contents;
+    savedMimeType = mimeType;
     return true;
   }
 
@@ -48,7 +54,9 @@ void main() {
         overrides: [
           transactionRepositoryProvider.overrideWithValue(txRepo),
           categoryRepositoryProvider.overrideWithValue(catRepo),
-          budgetRepositoryProvider.overrideWithValue(InMemoryBudgetRepository()),
+          budgetRepositoryProvider.overrideWithValue(
+            InMemoryBudgetRepository(),
+          ),
           selectedMonthProvider.overrideWith(
             () => FixedMonthNotifier(DateTime(2026, 9)),
           ),
@@ -121,4 +129,86 @@ void main() {
     await tester.pumpAndSettle();
     expect(txRepo.items.keys.toSet(), {'1', '2'});
   });
+
+  group('Export to CSV', () {
+    Future<void> pumpWithFilter(
+      WidgetTester tester,
+      TransactionFilter filter,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            transactionRepositoryProvider.overrideWithValue(txRepo),
+            categoryRepositoryProvider.overrideWithValue(catRepo),
+            budgetRepositoryProvider.overrideWithValue(
+              InMemoryBudgetRepository(),
+            ),
+            backupFilesProvider.overrideWithValue(files),
+            selectedMonthProvider.overrideWith(
+              () => FixedMonthNotifier(DateTime(2026, 9)),
+            ),
+            transactionFilterProvider.overrideWith(
+              () => _FixedFilterNotifier(filter),
+            ),
+          ],
+          child: const MaterialApp(home: HomePage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('exports every transaction as CSV', (tester) async {
+      txRepo.items
+        ..['1'] = makeTransaction('1', description: 'Lunch')
+        ..['2'] = makeTransaction('2', description: 'Taxi');
+      await pumpWithFilter(tester, const TransactionFilter());
+
+      await chooseMenu(tester, 'Export to CSV');
+      expect(
+        files.savedName,
+        matches(
+          RegExp(r'^expense_tracker_transactions_\d{4}-\d{2}-\d{2}\.csv$'),
+        ),
+      );
+      expect(files.savedMimeType, 'text/csv');
+      final lines = files.savedContents!.split('\r\n');
+      expect(lines.first, contains('Amount (USD)'));
+      expect(lines, hasLength(3));
+      expect(find.text('Exported 2 transactions'), findsOneWidget);
+    });
+
+    testWidgets('with an active filter, can export only the filtered ones', (
+      tester,
+    ) async {
+      txRepo.items
+        ..['1'] = makeTransaction('1', description: 'Lunch')
+        ..['2'] = makeTransaction('2', description: 'Taxi');
+      await pumpWithFilter(tester, const TransactionFilter(query: 'lunch'));
+
+      await chooseMenu(tester, 'Export to CSV');
+      expect(find.text('All transactions (2)'), findsOneWidget);
+      await tester.tap(find.text('Only the filtered transactions (1)'));
+      await tester.pumpAndSettle();
+
+      final lines = files.savedContents!.split('\r\n');
+      expect(lines, hasLength(2));
+      expect(lines.last, endsWith('Lunch'));
+    });
+
+    testWidgets('nothing to export', (tester) async {
+      await pumpWithFilter(tester, const TransactionFilter());
+      await chooseMenu(tester, 'Export to CSV');
+      expect(find.text('No transactions to export'), findsOneWidget);
+      expect(files.savedName, isNull);
+    });
+  });
+}
+
+class _FixedFilterNotifier extends TransactionFilterNotifier {
+  final TransactionFilter filter;
+
+  _FixedFilterNotifier(this.filter);
+
+  @override
+  TransactionFilter build() => filter;
 }
