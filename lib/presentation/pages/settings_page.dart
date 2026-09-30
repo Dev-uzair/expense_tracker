@@ -1,3 +1,5 @@
+import 'package:expense_tracker/presentation/security/pin_lock.dart';
+import 'package:expense_tracker/presentation/security/pin_screens.dart';
 import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,9 +36,57 @@ class SettingsPage extends ConsumerWidget {
     }
   }
 
+  Future<void> _setLock(BuildContext context, WidgetRef ref, bool on) async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (on) {
+      final saved = await navigator.push<bool>(
+        MaterialPageRoute(builder: (_) => const PinSetupScreen()),
+      );
+      if (saved == true) {
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(content: Text('App lock on')));
+      }
+      return;
+    }
+    final ok = await navigator.push<bool>(
+      MaterialPageRoute(
+        builder: (_) =>
+            const PinVerifyScreen(reason: 'to turn off the app lock'),
+      ),
+    );
+    if (ok == true) {
+      await ref.read(pinLockProvider.notifier).removePin();
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('App lock off')));
+    }
+  }
+
+  Future<void> _changePin(BuildContext context) async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await navigator.push<bool>(
+      MaterialPageRoute(
+        builder: (_) => const PinVerifyScreen(reason: 'to change your PIN'),
+      ),
+    );
+    if (ok != true) return;
+    final saved = await navigator.push<bool>(
+      MaterialPageRoute(builder: (_) => const PinSetupScreen()),
+    );
+    if (saved == true) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('PIN changed')));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    final lockEnabled = ref.watch(pinLockProvider.select((s) => s.enabled));
     final example = ref.watch(moneyFormatProvider).format(1234.5);
 
     return Scaffold(
@@ -86,6 +136,24 @@ class SettingsPage extends ConsumerWidget {
                   ref.read(settingsProvider.notifier).setThemeMode(s.first),
             ),
           ),
+          const Divider(height: 32),
+          SwitchListTile(
+            secondary: const Icon(Icons.lock_outline),
+            title: const Text('App lock'),
+            subtitle: const Text(
+              'Ask for a PIN when the app opens or returns after a minute '
+              'in the background',
+            ),
+            value: lockEnabled,
+            onChanged: (on) => _setLock(context, ref, on),
+          ),
+          if (lockEnabled)
+            ListTile(
+              leading: const Icon(Icons.pin_outlined),
+              title: const Text('Change PIN'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _changePin(context),
+            ),
         ],
       ),
     );
