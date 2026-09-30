@@ -1,6 +1,7 @@
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/presentation/notifiers/transaction_notifier.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 import 'package:expense_tracker/presentation/widgets/category_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -237,9 +238,10 @@ class _TransactionFormScreenState extends ConsumerState<TransactionFormScreen> {
                 // Digits with an optional dot and up to two decimals.
                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Amount',
-                border: OutlineInputBorder(),
+                prefixText: ref.watch(moneyFormatProvider).currencySymbol,
+                border: const OutlineInputBorder(),
               ),
               validator: validateAmount,
             ),

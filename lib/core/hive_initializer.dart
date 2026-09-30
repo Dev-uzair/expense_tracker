@@ -3,6 +3,7 @@ import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/domain/budget.dart';
 import 'package:expense_tracker/core/default_categories.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 import 'package:expense_tracker/data/hive_database.dart'; // To get box names
 
 class HiveInitializer {
@@ -21,6 +22,7 @@ class HiveInitializer {
       HiveDatabase.categoryBoxName,
     ); // Open with type and assign
     await Hive.openBox<Budget>(HiveDatabase.budgetBoxName);
+    await Hive.openBox<String>(HiveSettingsStore.boxName);
 
     // Initialize default categories if the category box is empty
     if (categoryBox.isEmpty) {

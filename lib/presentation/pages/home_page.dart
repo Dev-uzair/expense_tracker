@@ -4,6 +4,7 @@ import 'package:expense_tracker/data/backup_service.dart';
 import 'package:expense_tracker/presentation/providers/backup_providers.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/pages/analytics_page.dart';
+import 'package:expense_tracker/presentation/pages/settings_page.dart';
 import 'package:expense_tracker/presentation/pages/transaction_form_screen.dart';
 import 'package:expense_tracker/presentation/pages/transaction_list_screen.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
@@ -172,6 +173,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
+                case 'settings':
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                  );
                 case 'backup':
                   _backUp();
                 case 'restore':
@@ -181,6 +186,15 @@ class _HomePageState extends ConsumerState<HomePage> {
               }
             },
             itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'settings',
+                child: ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text('Settings'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuDivider(),
               PopupMenuItem(
                 value: 'backup',
                 child: ListTile(

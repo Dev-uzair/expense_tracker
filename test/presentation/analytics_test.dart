@@ -113,12 +113,12 @@ void main() {
 
     expect(find.text('Spending by category'), findsOneWidget);
     expect(find.text('Rent'), findsOneWidget);
-    expect(find.text('150.00'), findsOneWidget);
+    expect(find.text(r'$150.00'), findsOneWidget);
     expect(find.text('73%'), findsOneWidget);
-    expect(find.text('205.00'), findsWidgets); // total, and September's row
+    expect(find.text(r'$205.00'), findsWidgets); // total, and September's row
     expect(find.byType(BarChart), findsOneWidget);
     expect(find.text('Sep 2026'), findsOneWidget); // table row
-    expect(find.text('999.00'), findsOneWidget); // August expense
+    expect(find.text(r'$999.00'), findsOneWidget); // August expense
 
     await tester.tap(find.byTooltip('Previous month'));
     await tester.pumpAndSettle();
