@@ -4,7 +4,7 @@ import 'package:expense_tracker/data/backup_service.dart';
 import 'package:expense_tracker/presentation/providers/backup_providers.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/pages/analytics_page.dart';
-import 'package:expense_tracker/presentation/pages/edit_transaction_screen.dart';
+import 'package:expense_tracker/presentation/pages/transaction_form_screen.dart';
 import 'package:expense_tracker/presentation/pages/transaction_list_screen.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +15,6 @@ import 'package:expense_tracker/presentation/widgets/balance_summary_card.dart';
 import 'package:expense_tracker/presentation/widgets/month_selector.dart';
 import 'package:expense_tracker/presentation/widgets/quick_stats_card.dart';
 import 'package:expense_tracker/presentation/widgets/transaction_list_item.dart';
-
-import 'add_transaction_screen.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -33,6 +31,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     TransactionListScreen(),
     AnalyticsPage(),
     CategoryListPage(),
+  ];
+
+  static const List<String> _titles = [
+    'Expense Tracker',
+    'Transactions',
+    'Analytics',
+    'Categories',
   ];
 
   void _onItemTapped(int index) {
@@ -161,7 +166,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Expense Tracker'),
+        title: Text(_titles[_selectedIndex]),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           PopupMenuButton<String>(
@@ -214,7 +219,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const AddTransactionScreen(),
+                    builder: (context) => const TransactionFormScreen(),
                   ),
                 );
               },
@@ -333,7 +338,7 @@ class DashboardPage extends ConsumerWidget {
                     category: categoryMap[tx.categoryId],
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => EditTransactionScreen(
+                        builder: (context) => TransactionFormScreen(
                           transaction: tx,
                           category: categoryMap[tx.categoryId],
                         ),

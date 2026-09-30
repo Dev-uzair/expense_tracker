@@ -1,7 +1,7 @@
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
-import 'package:expense_tracker/presentation/pages/edit_transaction_screen.dart';
+import 'package:expense_tracker/presentation/pages/transaction_form_screen.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/presentation/widgets/empty_state_widget.dart';
 import 'package:expense_tracker/presentation/widgets/transaction_list_item.dart';
@@ -39,9 +39,17 @@ class TransactionListScreen extends ConsumerStatefulWidget {
 }
 
 class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
-  late final TextEditingController _searchController = TextEditingController(
-    text: ref.read(transactionFilterProvider).query,
-  );
+  // Created in initState: a lazy field would first be touched in dispose()
+  // when the list was never shown, and ref can't be used there.
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(
+      text: ref.read(transactionFilterProvider).query,
+    );
+  }
 
   @override
   void dispose() {
@@ -230,7 +238,6 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
     final filter = ref.watch(transactionFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Transactions')),
       body: transactionsAsyncValue.when(
         data: (data) {
           final (transactions, categoryMap) = data;
@@ -421,7 +428,7 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => EditTransactionScreen(
+                      builder: (context) => TransactionFormScreen(
                         transaction: item.transaction,
                         category: category,
                       ),

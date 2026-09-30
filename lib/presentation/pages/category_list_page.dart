@@ -11,10 +11,6 @@ class CategoryListPage extends ConsumerWidget {
     final categoriesAsyncValue = ref.watch(categoryNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Categories'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
       body: categoriesAsyncValue.when(
         data: (categories) {
           if (categories.isEmpty) {
