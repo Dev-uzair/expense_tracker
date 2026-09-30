@@ -3,7 +3,10 @@ import 'package:hive/hive.dart';
 
 part 'budget.g.dart';
 
+// HiveObject keeps a mutable box/key reference, so the class can't be fully
+// immutable even though all of its own fields are final.
 @HiveType(typeId: 2)
+// ignore: must_be_immutable
 class Budget extends HiveObject with EquatableMixin {
   @HiveField(0)
   final String id;

@@ -22,7 +22,7 @@ class BalanceSummaryCard extends StatelessWidget {
             Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8.0),
             Text(
-              '${balance.toStringAsFixed(2)}',
+              balance.toStringAsFixed(2),
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                 color: balance >= 0 ? Colors.green : Colors.red,
               ),

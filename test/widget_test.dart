@@ -1,30 +1,48 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:expense_tracker/domain/category.dart';
+import 'package:expense_tracker/main.dart';
+import 'package:expense_tracker/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:expense_tracker/main.dart';
+import 'helpers/fake_repositories.dart';
 
+// Smoke test: the whole app starts and every tab opens.
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('app starts and every tab opens', (tester) async {
+    final catRepo = InMemoryCategoryRepository()
+      ..items['c1'] = Category(id: 'c1', name: 'Food', type: 'expense');
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          transactionRepositoryProvider.overrideWithValue(
+            InMemoryTransactionRepository(),
+          ),
+          categoryRepositoryProvider.overrideWithValue(catRepo),
+        ],
+        child: const MyApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    AppBar appBar() => tester.widget<AppBar>(find.byType(AppBar));
+    String title() => (appBar().title! as Text).data!;
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    expect(title(), 'Expense Tracker');
+    expect(find.byType(FloatingActionButton), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    for (final tab in ['Transactions', 'Analytics', 'Categories']) {
+      await tester.tap(
+        find.descendant(
+          of: find.byType(BottomNavigationBar),
+          matching: find.text(tab),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(title(), tab);
+      // Each tab sits inside the home page's Scaffold: one app bar only.
+      expect(find.byType(AppBar), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
   });
 }

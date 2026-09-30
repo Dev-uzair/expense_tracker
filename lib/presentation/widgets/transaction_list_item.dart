@@ -26,8 +26,18 @@ class TransactionListItem extends StatelessWidget {
     return ListTile(
       onTap: onTap,
       leading: Icon(categoryIconData(category?.categoryIcon)),
-      title: Text(transaction.description ?? 'N/A'),
-      subtitle: Text(DateFormat.yMd().add_jm().format(transaction.date)),
+      title: Text(
+        transaction.description ?? category?.name ?? 'Transaction',
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        [
+          // The category is already the title when there's no description.
+          if (transaction.description != null && category != null)
+            category!.name,
+          DateFormat.yMd().add_jm().format(transaction.date),
+        ].join(' · '),
+      ),
       trailing: Text(
         amountString,
         style: TextStyle(color: amountColor, fontWeight: FontWeight.bold),

@@ -28,7 +28,7 @@ class CategorySelector extends ConsumerWidget {
 
         if (filteredCategories.isEmpty) {
           return Center(
-            child: Text('No ${selectedTransactionType} categories found.'),
+            child: Text('No $selectedTransactionType categories found.'),
           );
         }
 

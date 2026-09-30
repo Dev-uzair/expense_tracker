@@ -35,7 +35,7 @@ class QuickStatsCard extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             Text(
-              '${value.toStringAsFixed(2)}',
+              value.toStringAsFixed(2),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(color: color),
             ),
           ],

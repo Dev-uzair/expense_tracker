@@ -16,12 +16,13 @@ class HiveInitializer {
     Hive.registerAdapter(BudgetAdapter());
 
     // Open your boxes here with specific types
-    final transactionBox = await Hive.openBox<Transaction>(HiveDatabase.transactionBoxName);
-    final categoryBox = await Hive.openBox<Category>(HiveDatabase.categoryBoxName); // Open with type and assign
+    await Hive.openBox<Transaction>(HiveDatabase.transactionBoxName);
+    final categoryBox = await Hive.openBox<Category>(
+      HiveDatabase.categoryBoxName,
+    ); // Open with type and assign
     await Hive.openBox<Budget>(HiveDatabase.budgetBoxName);
 
     // Initialize default categories if the category box is empty
-    // final categoryBox = Hive.box<Category>(HiveDatabase.categoryBoxName);
     if (categoryBox.isEmpty) {
       for (var category in defaultExpenseCategories) {
         await categoryBox.put(category.id, category);
