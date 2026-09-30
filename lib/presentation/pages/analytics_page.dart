@@ -2,6 +2,7 @@ import 'package:expense_tracker/core/category_icons.dart';
 import 'package:expense_tracker/presentation/analytics/analytics_data.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 import 'package:expense_tracker/presentation/widgets/month_selector.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 // Series colours for the income/expense chart. Blue/orange rather than
-// green/red so the pair stays distinguishable with colour-vision deficiency.
-const Color incomeColor = Color(0xFF2A78D6);
-const Color expenseColor = Color(0xFFEB6834);
+// green/red so the pair stays distinguishable with colour-vision deficiency;
+// dark mode uses the same hues stepped for the dark surface.
+Color incomeColor(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark
+    ? const Color(0xFF3987E5)
+    : const Color(0xFF2A78D6);
+
+Color expenseColor(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark
+    ? const Color(0xFFD95926)
+    : const Color(0xFFEB6834);
 
 class AnalyticsPage extends ConsumerWidget {
   const AnalyticsPage({super.key});
@@ -20,6 +29,7 @@ class AnalyticsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dataAsync = ref.watch(transactionWithCategoryProvider);
     final month = ref.watch(selectedMonthProvider);
+    final money = ref.watch(moneyFormatProvider);
 
     return dataAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -38,11 +48,11 @@ class AnalyticsPage extends ConsumerWidget {
             ),
             _Section(
               title: 'Spending by category',
-              child: _CategoryBreakdown(items: byCategory),
+              child: _CategoryBreakdown(items: byCategory, money: money),
             ),
             _Section(
               title: 'Income vs expense, last 6 months',
-              child: _MonthlyChart(months: months),
+              child: _MonthlyChart(months: months, money: money),
             ),
           ],
         );
@@ -80,8 +90,9 @@ class _Section extends StatelessWidget {
 // there are many categories with similar amounts, and it doubles as the table.
 class _CategoryBreakdown extends StatelessWidget {
   final List<CategorySpend> items;
+  final NumberFormat money;
 
-  const _CategoryBreakdown({required this.items});
+  const _CategoryBreakdown({required this.items, required this.money});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +125,7 @@ class _CategoryBreakdown extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            item.amount.toStringAsFixed(2),
+                            money.format(item.amount),
                             style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                           SizedBox(
@@ -139,7 +150,7 @@ class _CategoryBreakdown extends StatelessWidget {
                                 constraints.maxWidth *
                                 (item.amount / largest).clamp(0.02, 1.0),
                             decoration: BoxDecoration(
-                              color: expenseColor,
+                              color: expenseColor(context),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -157,7 +168,7 @@ class _CategoryBreakdown extends StatelessWidget {
             const Text('Total'),
             const Spacer(),
             Text(
-              total.toStringAsFixed(2),
+              money.format(total),
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 48),
@@ -170,8 +181,9 @@ class _CategoryBreakdown extends StatelessWidget {
 
 class _MonthlyChart extends StatelessWidget {
   final List<MonthTotals> months;
+  final NumberFormat money;
 
-  const _MonthlyChart({required this.months});
+  const _MonthlyChart({required this.months, required this.money});
 
   @override
   Widget build(BuildContext context) {
@@ -191,10 +203,10 @@ class _MonthlyChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: const [
-            _LegendItem(color: incomeColor, label: 'Income'),
-            SizedBox(width: 16),
-            _LegendItem(color: expenseColor, label: 'Expense'),
+          children: [
+            _LegendItem(color: incomeColor(context), label: 'Income'),
+            const SizedBox(width: 16),
+            _LegendItem(color: expenseColor(context), label: 'Expense'),
           ],
         ),
         const SizedBox(height: 16),
@@ -210,8 +222,8 @@ class _MonthlyChart extends StatelessWidget {
                     x: i,
                     barsSpace: 2,
                     barRods: [
-                      _rod(months[i].income, incomeColor),
-                      _rod(months[i].expense, expenseColor),
+                      _rod(months[i].income, incomeColor(context)),
+                      _rod(months[i].expense, expenseColor(context)),
                     ],
                   ),
               ],
@@ -262,7 +274,7 @@ class _MonthlyChart extends StatelessWidget {
                     return BarTooltipItem(
                       '${DateFormat.yMMM().format(m.month)}\n'
                       '${rodIndex == 0 ? 'Income' : 'Expense'}: '
-                      '${rod.toY.toStringAsFixed(2)}',
+                      '${money.format(rod.toY)}',
                       TextStyle(color: theme.colorScheme.onInverseSurface),
                     );
                   },
@@ -293,8 +305,8 @@ class _MonthlyChart extends StatelessWidget {
               TableRow(
                 children: [
                   Text(DateFormat.yMMM().format(m.month)),
-                  Text(m.income.toStringAsFixed(2), textAlign: TextAlign.end),
-                  Text(m.expense.toStringAsFixed(2), textAlign: TextAlign.end),
+                  Text(money.format(m.income), textAlign: TextAlign.end),
+                  Text(money.format(m.expense), textAlign: TextAlign.end),
                 ],
               ),
           ],

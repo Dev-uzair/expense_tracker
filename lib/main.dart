@@ -1,30 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/core/hive_initializer.dart';
-import 'package:expense_tracker/presentation/pages/home_page.dart'; // Import HomePage
+import 'package:expense_tracker/presentation/pages/home_page.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveInitializer.init();
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Expense Tracker',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(), // Changed to HomePage
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
+      themeMode: ref.watch(settingsProvider.select((s) => s.themeMode)),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,6 +1,7 @@
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/presentation/providers/filter_providers.dart';
 import 'package:expense_tracker/presentation/providers/transaction_providers.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 import 'package:expense_tracker/presentation/pages/transaction_form_screen.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:expense_tracker/presentation/widgets/empty_state_widget.dart';
@@ -304,12 +305,12 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
           Text('${visible.length} found'),
           const Spacer(),
           Text(
-            '+${income.toStringAsFixed(2)}',
+            '+${ref.watch(moneyFormatProvider).format(income)}',
             style: const TextStyle(color: Colors.green),
           ),
           const SizedBox(width: 12),
           Text(
-            '-${expense.toStringAsFixed(2)}',
+            '-${ref.watch(moneyFormatProvider).format(expense)}',
             style: const TextStyle(color: Colors.red),
           ),
         ],
@@ -365,7 +366,7 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   Text(
-                    '\$${item.total.toStringAsFixed(2)}',
+                    ref.watch(moneyFormatProvider).format(item.total),
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ],

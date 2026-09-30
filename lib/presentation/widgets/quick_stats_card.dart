@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 
-class QuickStatsCard extends StatelessWidget {
+class QuickStatsCard extends ConsumerWidget {
   final String title;
   final double value;
   final IconData icon;
@@ -15,7 +17,7 @@ class QuickStatsCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: Padding(
@@ -27,16 +29,15 @@ class QuickStatsCard extends StatelessWidget {
               children: [
                 Icon(icon, color: color),
                 const SizedBox(width: 8.0),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
+                Text(title, style: Theme.of(context).textTheme.titleSmall),
               ],
             ),
             const SizedBox(height: 8.0),
             Text(
-              value.toStringAsFixed(2),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: color),
+              ref.watch(moneyFormatProvider).format(value),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: color),
             ),
           ],
         ),

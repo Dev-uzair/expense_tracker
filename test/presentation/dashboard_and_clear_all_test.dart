@@ -47,9 +47,9 @@ void main() {
       ..['3'] = makeTransaction('3', amount: 49.5);
     await pumpHome(tester);
 
-    expect(find.text('700.00'), findsOneWidget); // balance
-    expect(find.text('1000.00'), findsOneWidget); // income
-    expect(find.text('300.00'), findsOneWidget); // expense
+    expect(find.text(r'$700.00'), findsOneWidget); // balance
+    expect(find.text(r'$1,000.00'), findsOneWidget); // income
+    expect(find.text(r'$300.00'), findsOneWidget); // expense
   });
 
   testWidgets('dashboard lists the newest transactions first, at most 5', (
@@ -79,7 +79,7 @@ void main() {
     tester,
   ) async {
     await pumpHome(tester);
-    expect(find.text('0.00'), findsNWidgets(3));
+    expect(find.text(r'$0.00'), findsNWidgets(3));
     expect(
       find.text('No transactions this month. Tap + to add one.'),
       findsOneWidget,
@@ -111,15 +111,15 @@ void main() {
     expect(find.text('September 2026'), findsOneWidget);
     expect(find.text('September rent'), findsOneWidget);
     expect(find.text('August rent'), findsNothing);
-    expect(find.text('-500.00'), findsOneWidget); // balance
-    expect(find.text('500.00'), findsOneWidget); // expense
+    expect(find.text(r'-$500.00'), findsNWidgets(2)); // balance, recent row
+    expect(find.text(r'$500.00'), findsOneWidget); // expense
 
     await tester.tap(find.byTooltip('Previous month'));
     await tester.pumpAndSettle();
     expect(find.text('August 2026'), findsOneWidget);
     expect(find.text('August rent'), findsOneWidget);
     expect(find.text('September rent'), findsNothing);
-    expect(find.text('450.00'), findsOneWidget);
+    expect(find.text(r'$450.00'), findsOneWidget);
   });
 
   testWidgets('clear all transactions asks first, then empties everything', (

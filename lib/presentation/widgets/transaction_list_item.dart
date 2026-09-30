@@ -2,9 +2,11 @@ import 'package:expense_tracker/core/category_icons.dart';
 import 'package:expense_tracker/domain/category.dart';
 import 'package:expense_tracker/domain/transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 import 'package:intl/intl.dart';
 
-class TransactionListItem extends StatelessWidget {
+class TransactionListItem extends ConsumerWidget {
   final Transaction transaction;
   final Category? category;
   final VoidCallback? onTap;
@@ -17,11 +19,11 @@ class TransactionListItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isExpense = transaction.type == 'expense';
     final amountColor = isExpense ? Colors.red : Colors.green;
     final amountString =
-        '${isExpense ? '-' : '+'}\$${transaction.amount.toStringAsFixed(2)}';
+        '${isExpense ? '-' : '+'}${ref.watch(moneyFormatProvider).format(transaction.amount)}';
 
     return ListTile(
       onTap: onTap,

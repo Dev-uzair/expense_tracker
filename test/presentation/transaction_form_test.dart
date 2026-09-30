@@ -208,18 +208,20 @@ void main() {
     tester,
   ) async {
     final food = Category(id: 'food', name: 'Food', type: 'expense');
-    Widget item(String? description) => MaterialApp(
-      home: Material(
-        child: TransactionListItem(
-          transaction: Transaction(
-            id: '1',
-            amount: 5,
-            categoryId: 'food',
-            type: 'expense',
-            date: DateTime(2026, 9, 1),
-            description: description,
+    Widget item(String? description) => ProviderScope(
+      child: MaterialApp(
+        home: Material(
+          child: TransactionListItem(
+            transaction: Transaction(
+              id: '1',
+              amount: 5,
+              categoryId: 'food',
+              type: 'expense',
+              date: DateTime(2026, 9, 1),
+              description: description,
+            ),
+            category: food,
           ),
-          category: food,
         ),
       ),
     );
