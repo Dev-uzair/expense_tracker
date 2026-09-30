@@ -44,15 +44,15 @@ Both are rebuilt and published automatically on every push to `main`, so the lin
 
 ## ✨ Features
 
-- **Transaction Management**: Easily add, view, edit, and delete income and expense records.
-- **Category Management**: Organize transactions with predefined and custom categories.
-- **Interactive Analytics**: Visualize your finances with interactive charts (Pie, Bar, Line) and reports.
-- **Budgeting Tools**: Set and monitor budgets for different categories and time periods.
-- **Smart Alerts**: Receive notifications when you're approaching your budget limits.
-- **Data Export**: Export your transaction data to CSV or generate PDF reports.
-- **Customization**: Personalize the app with light and dark themes, and other preferences.
-- **Security**: Protect your data with PIN or biometric authentication.
-- **Offline First**: All features are available offline.
+- **Transactions**: add, edit and delete income and expenses (swipe to delete with undo); search and filter by period, type and category.
+- **Dashboard**: balance, income and expense for any month, recent transactions, and budget progress.
+- **Categories**: built-in and custom categories with icons; deleting one moves its transactions to another category.
+- **Budgets**: monthly limits per category or for all expenses, flagged at 80% and when over.
+- **Analytics**: spending by category and a 6-month income vs expense chart.
+- **Export & backup**: export transactions to CSV; back up and restore everything as a JSON file.
+- **Settings**: currency (USD, EUR, GBP, PKR, INR, BDT, AED, SAR, CAD, AUD) and light/dark/system theme.
+- **App lock**: optional 4–6 digit PIN when the app opens or returns from the background.
+- **Offline first**: all data stays on the device.
 
 ## 📸 Screenshots
 
@@ -64,14 +64,14 @@ Both are rebuilt and published automatically on every push to `main`, so the lin
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Flutter
-- **Language**: Dart
-- **State Management**: Provider / Riverpod / BLoC
-- **Database**: Hive / SQLite / Isar
+- **Framework**: Flutter (Dart)
+- **State Management**: Riverpod
+- **Database**: Hive (local storage)
 - **Charts**: `fl_chart`
-- **Date/Time Formatting**: `intl`
-- **Security**: `flutter_secure_storage`, `local_auth`
-- **Notifications**: `flutter_local_notifications`
+- **Date/Number Formatting**: `intl`
+- **Files**: `file_picker` (backup, restore, CSV export)
+- **PIN hashing**: `crypto`
+- **CI**: GitHub Actions: tests, web deploy to GitHub Pages, Android APK releases
 
 ## 🏗️ Architecture
 

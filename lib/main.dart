@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expense_tracker/core/hive_initializer.dart';
 import 'package:expense_tracker/presentation/pages/home_page.dart';
+import 'package:expense_tracker/presentation/security/pin_screens.dart';
 import 'package:expense_tracker/presentation/settings/settings_providers.dart';
 
 void main() async {
@@ -30,6 +31,8 @@ class MyApp extends ConsumerWidget {
       ),
       themeMode: ref.watch(settingsProvider.select((s) => s.themeMode)),
       home: const HomePage(),
+      // Above the Navigator, so the lock covers every page and dialog.
+      builder: (context, child) => LockGate(child: child!),
       debugShowCheckedModeBanner: false,
     );
   }

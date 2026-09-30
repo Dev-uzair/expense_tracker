@@ -47,6 +47,7 @@ class AppSettings {
 abstract class SettingsStore {
   String? read(String key);
   Future<void> write(String key, String value);
+  Future<void> remove(String key);
 }
 
 class HiveSettingsStore implements SettingsStore {
@@ -61,8 +62,10 @@ class HiveSettingsStore implements SettingsStore {
   String? read(String key) => _box?.get(key);
 
   @override
-  Future<void> write(String key, String value) async =>
-      _box?.put(key, value);
+  Future<void> write(String key, String value) async => _box?.put(key, value);
+
+  @override
+  Future<void> remove(String key) async => _box?.delete(key);
 }
 
 class MemorySettingsStore implements SettingsStore {
@@ -73,6 +76,9 @@ class MemorySettingsStore implements SettingsStore {
 
   @override
   Future<void> write(String key, String value) async => values[key] = value;
+
+  @override
+  Future<void> remove(String key) async => values.remove(key);
 }
 
 final settingsStoreProvider = Provider<SettingsStore>(
