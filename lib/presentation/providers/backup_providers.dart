@@ -18,7 +18,11 @@ final backupServiceProvider = Provider<BackupService>((ref) {
 // replace them.
 abstract class BackupFiles {
   // Returns false if the user cancelled.
-  Future<bool> save(String fileName, String contents);
+  Future<bool> save(
+    String fileName,
+    String contents, {
+    String mimeType = 'application/json',
+  });
 
   // Returns null if the user cancelled.
   Future<String?> pickText();
@@ -28,13 +32,17 @@ class FilePickerBackupFiles implements BackupFiles {
   const FilePickerBackupFiles();
 
   @override
-  Future<bool> save(String fileName, String contents) async {
+  Future<bool> save(
+    String fileName,
+    String contents, {
+    String mimeType = 'application/json',
+  }) async {
     final uri = await FilePicker.saveFile(
       fileName: fileName,
       bytes: Uint8List.fromList(utf8.encode(contents)),
-      mimeType: 'application/json',
+      mimeType: mimeType,
       type: FileType.custom,
-      allowedExtensions: const ['json'],
+      allowedExtensions: [fileName.split('.').last],
     );
     return uri != null;
   }
